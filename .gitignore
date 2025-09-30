@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+
+# IDE
+*.iml
+/.idea/caches/
+/.idea/libraries/
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/gradle.xml  # optional if you don’t want IDE Gradle config tracked
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Captures
+captures/
+
+# External builds
+.externalNativeBuild/
+.cxx/
+
+# Kotlin/Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Generated resources
+*.apk
+*.ap_
+*.aab
+
+# Optional: ignore module build directories
+/audio-redaction/build/
+/image-redaction/build/
+/text-redaction/build/
+
+.kotlin/errors/
