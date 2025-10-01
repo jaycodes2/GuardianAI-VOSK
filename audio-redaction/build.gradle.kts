@@ -64,6 +64,8 @@ dependencies {
 // Use the -ktx version for Kotlin projects
     implementation("androidx.activity:activity-ktx:1.9.0")
 
+    implementation("org.json:json:20250517")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

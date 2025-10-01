@@ -5,12 +5,12 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +18,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AudioRedactionScreen(manager: AudioRedactionManager) {
-
+fun AudioRedactionScreen() {
     val context = LocalContext.current
+    val manager = remember { AudioRedactionManager(context) } // ✅ Only context required
+
     var transcription by remember { mutableStateOf("No audio selected or transcription started.") }
     var loading by remember { mutableStateOf(false) }
 
@@ -29,8 +30,6 @@ fun AudioRedactionScreen(manager: AudioRedactionManager) {
             uri?.let {
                 loading = true
                 transcription = "Transcribing..."
-
-                // Call the manager function. The state update (onResult) happens on Dispatchers.Main
                 manager.transcribeAudioWithTimestamps(it) { result ->
                     transcription = result
                     loading = false
@@ -63,8 +62,15 @@ fun AudioRedactionScreen(manager: AudioRedactionManager) {
             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         }
 
-        Text(text = "Transcription Result:", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Transcription Result:",
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = transcription)
+
+        Text(
+            text = transcription,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

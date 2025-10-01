@@ -34,7 +34,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.fragment.app.FragmentActivity
 import com.dsatm.audio_redaction.ui.AudioRedactionScreen
-import com.dsatm.audio_redaction.ui.AudioRedactionManager
 import com.dsatm.guardianai.security.SecurityManager
 import com.dsatm.guardianai.ui.theme.GuardianAITheme
 import com.dsatm.image_redaction.ui.ImageRedactionScreen
@@ -95,8 +94,6 @@ class MainActivity : FragmentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    val context = LocalContext.current
-    val audioManager = remember { AudioRedactionManager(context) } // <-- Manager initialized here
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -107,9 +104,9 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Image.route) { ImageRedactionScreen() }
-            composable(Screen.Audio.route) { AudioRedactionScreen(manager = audioManager) } // <-- Manager passed
+            composable(Screen.Audio.route) { AudioRedactionScreen() } // ✅ no manager param
             composable(Screen.Text.route) { TextRedactionScreen() }
-            composable(Screen.Crypto.route) { CryptoDemoScreen(activity = context as FragmentActivity) }
+            composable(Screen.Crypto.route) { CryptoDemoScreen(activity = LocalContext.current as FragmentActivity) }
         }
     }
 }

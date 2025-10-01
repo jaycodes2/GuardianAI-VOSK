@@ -1,13 +1,9 @@
-// File: MainContentScreen.kt
 package com.dsatm.guardianai.ui.screens
 
-import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.dsatm.audio_redaction.ui.AudioRedactionManager
 import com.dsatm.audio_redaction.ui.AudioRedactionScreen
 import com.dsatm.image_redaction.ui.ImageRedactionScreen
 import com.dsatm.text_redaction.ui.TextRedactionScreen
@@ -18,10 +14,6 @@ import com.dsatm.guardianai.ui.components.TopAppBarWithLogo
 fun MainContentScreen() {
     var selectedModule by remember { mutableStateOf(0) }
     val modules = listOf("Image", "Audio", "Text")
-
-    // Initialize AudioRedactionManager once
-    val context = LocalContext.current
-    val audioManager = remember { AudioRedactionManager(context) }
 
     Column(
         modifier = Modifier
@@ -35,16 +27,14 @@ fun MainContentScreen() {
             onModuleSelected = { selectedModule = it }
         )
 
-        // The content area now correctly fills the remaining space
         Column(
             modifier = Modifier
-                // Use weight to make this column take up all the remaining vertical space
                 .weight(1f)
                 .padding(horizontal = 16.dp, vertical = 20.dp)
         ) {
             when (selectedModule) {
                 0 -> ImageRedactionScreen()
-                1 -> AudioRedactionScreen(manager = audioManager) // <-- Pass manager here
+                1 -> AudioRedactionScreen() // ✅ no manager param
                 2 -> TextRedactionScreen()
             }
         }
