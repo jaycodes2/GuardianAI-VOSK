@@ -1,3 +1,5 @@
+// File: com.dsatm.text_redaction.ui/TextRedactionScreen.kt
+
 package com.dsatm.text_redaction.ui
 
 import androidx.compose.foundation.layout.Box
@@ -52,17 +54,16 @@ fun TextRedactionScreen() {
     var inputText by remember { mutableStateOf("") }
     var uiState by remember { mutableStateOf<UiState>(UiState.InitialLoading) }
 
-    // Logic to enable the Redact button: ready OR a previous result is displayed
     val isRedactEnabled = uiState is UiState.Ready || uiState is UiState.Result
 
-    // This LaunchedEffect will only run ONCE to initialize the model.
+    // Initialize the model once
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             try {
                 nerManager.initialize()
                 uiState = UiState.Ready
             } catch (e: Exception) {
-                uiState = UiState.Error("Initialization Error: ${e.message}")
+                uiState = UiState.Error("Initialization Error: ${e.localizedMessage ?: e.message}")
             }
         }
     }
@@ -73,7 +74,7 @@ fun TextRedactionScreen() {
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter // Use TopCenter for better layout
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,13 +92,14 @@ fun TextRedactionScreen() {
                     value = inputText,
                     onValueChange = { inputText = it },
                     label = { Text("Enter text to redact") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = uiState !is UiState.Processing && uiState !is UiState.InitialLoading
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    // Redact Button (Takes up 70% of the space)
+                    // Redact Button
                     Button(
                         onClick = {
                             if (isRedactEnabled) {
@@ -105,27 +107,28 @@ fun TextRedactionScreen() {
                                     uiState = UiState.Processing
                                     try {
                                         val entities = nerManager.detectPii(inputText)
+
+                                        // 🛑 CORRECT CALL: References the function on the postProcessor object
                                         val redactedText = nerManager.postProcessor.redactText(inputText, entities)
-                                        // Crucial: Stay in the Result state so the Redact button remains enabled for a new click
+
                                         uiState = UiState.Result(redactedText, entities)
                                     } catch (e: Exception) {
-                                        uiState = UiState.Error("Detection Error: ${e.message}")
+                                        uiState = UiState.Error("Detection Error: ${e.localizedMessage ?: e.message}")
                                     }
                                 }
                             }
                         },
                         modifier = Modifier.weight(0.7f).height(50.dp),
-                        enabled = isRedactEnabled && inputText.isNotEmpty() // Disable if input is empty
+                        enabled = isRedactEnabled && inputText.isNotEmpty()
                     ) {
                         Text("Redact Text")
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Reset Button (Takes up 30% of the space)
+                    // Reset Button
                     Button(
                         onClick = {
-                            // Clear input and reset state to Ready, allowing the user to start fresh
                             inputText = ""
                             uiState = UiState.Ready
                         },
@@ -151,14 +154,29 @@ fun TextRedactionScreen() {
                         Text("Processing text...")
                     }
                     is UiState.Result -> {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 text = "Redacted Text:",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 8.dp)
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = currentState.redactedText, style = MaterialTheme.typography.bodyMedium)
+                            Text(text = currentState.redactedText, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = "Detected Entities:",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            currentState.entities.forEach { entity ->
+                                Text(
+                                    text = "-> [${entity.label}]: \"${entity.text}\" (Start: ${entity.start}, End: ${entity.end})",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                     is UiState.Error -> {
