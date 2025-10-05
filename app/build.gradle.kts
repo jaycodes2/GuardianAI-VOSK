@@ -98,6 +98,8 @@ dependencies {
     ksp("com.google.dagger:hilt-compiler:2.56.2")
     implementation("androidx.activity:activity-compose:1.9.0")
 
+    // FFMPEG
+
     // TESTING DEPENDENCIES
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

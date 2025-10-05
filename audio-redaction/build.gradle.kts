@@ -65,6 +65,13 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.0")
 
     implementation("org.json:json:20250517")
+    // FFMPEG for audio beeping
+
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
+
+
+
+
 
 
     testImplementation(libs.junit)
